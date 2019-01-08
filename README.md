@@ -11,3 +11,6 @@ To test, make sure you connect your phone or run your emulator then run this
 ```shell
 react-native run-android
 ```
+
+## Result
+![result](react-native-interactive-map.gif)
