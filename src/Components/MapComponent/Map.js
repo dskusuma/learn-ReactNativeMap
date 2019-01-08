@@ -66,8 +66,10 @@ class Map extends React.PureComponent {
         key: '',
         status: '',
         placeName: '',
-        address: ''
-      }
+        address:''
+      },
+      draftPlaceName: '',
+      draftAddress:''
     }
   }
 
@@ -115,9 +117,43 @@ class Map extends React.PureComponent {
           status: false,
         },
       })
-    }
-    
+    } 
   }
+
+  onAddButtonPress() {
+    console.log("draftMarker.asdf", this.state.draftPlaceName);
+    console.log("draftMarker.address", this.state.draftAddress);
+
+    // add current draftMarker to markers array
+    let markerObject = {
+      coordinate: this.state.draftMarker.coordinate,
+      key: id++,
+      placeName: this.state.draftPlaceName,
+      address: this.state.draftAddress
+    }
+
+    this.setState({
+      markers: [
+        ...this.state.markers,
+        markerObject
+      ],
+    })
+
+    // delete the current draft
+    this.setState({
+      addingPhase: false,
+      draftMarker: {
+        coordinate: '',
+        key: '',
+        status: '',
+        placeName: '',
+        address:''
+      },
+      draftPlaceName: '',
+      draftAddress:''
+    })
+  }
+
   render() {
     let googleProviderProps = {};
     if (this.props.provider === PROVIDER_GOOGLE) {
@@ -146,12 +182,31 @@ class Map extends React.PureComponent {
           onCalloutPress={this.recordEvent('Map::onCalloutPress')}
           {...googleProviderProps}
         >
+          {/* Render registered markers */}
           {this.state.markers.map( marker => (
             <Marker
-              key={marker.key}
+              title="This is a title"
+              description="This is a description"
+              kye={marker.key}
               coordinate={marker.coordinate}
-            />
+              onPress={this.recordEvent('Marker::onPress')}
+              onSelect={this.recordEvent('Marker::onSelect')}
+              onDeselect={this.recordEvent('Marker::onDeselect')}
+              onCalloutPress={this.recordEvent('Marker::onCalloutPress')}
+            >
+              <Callout
+                style={styles.callout}
+                onPress={this.recordEvent('Callout::onPress')}
+              >
+                <View>
+                  <Text>Name: {marker.placeName}</Text>
+                  <Text>Address: {marker.address}</Text>
+                </View>
+              </Callout>
+            </Marker>
           ))}
+
+          {/* Render draft marker */}
           {this.state.draftMarker.status === true 
             ? 
             <Marker
@@ -160,43 +215,7 @@ class Map extends React.PureComponent {
             :
             null
             }
-          {/* <Marker
-            coordinate={{
-              latitude: LATITUDE + (LATITUDE_DELTA / 2),
-              longitude: LONGITUDE + (LONGITUDE_DELTA / 2),
-            }}
-          />
-          <Marker
-            coordinate={{
-              latitude: LATITUDE - (LATITUDE_DELTA / 2),
-              longitude: LONGITUDE - (LONGITUDE_DELTA / 2),
-            }}
-          />
-          <Marker
-            title="This is a title"
-            description="This is a description"
-            coordinate={this.state.region}
-            onPress={this.recordEvent('Marker::onPress')}
-            onSelect={this.recordEvent('Marker::onSelect')}
-            onDeselect={this.recordEvent('Marker::onDeselect')}
-            onCalloutPress={this.recordEvent('Marker::onCalloutPress')}
-          >
-            <PriceMarker amount={99} />
-            <Callout
-              style={styles.callout}
-              onPress={this.recordEvent('Callout::onPress')}
-            >
-              <View>
-                <Text>Well hello there...</Text>
-              </View>
-            </Callout>
-          </Marker> */}
         </MapView>
-        {/* <View style={styles.eventList}>
-          <ScrollView>
-            {this.state.events.map(event => <Event key={event.id} event={event} />)}
-          </ScrollView>
-        </View> */}
         {
           this.state.addingPhase ? 
             <View style={styles.formContainer}>
@@ -205,7 +224,8 @@ class Map extends React.PureComponent {
                 placeholder="Place's name"
                 leftIcon={{ type: 'font-awesome', name: 'home' , color: '#b2bec3'}}
                 shake={true}
-
+                onChangeText={(t) => {this.setState({draftPlaceName: t}) }}
+                value={this.state.draftPlaceName}
                 inputContainerStyle={styles.inputContainer}
                 inputStyle={{
                   fontSize: 15
@@ -216,6 +236,8 @@ class Map extends React.PureComponent {
                 placeholder="Address' name"
                 leftIcon={{ type: 'font-awesome', name: 'location-arrow' , color: '#b2bec3'}}
                 shake={true}
+                onChangeText={(t) => {this.setState({draftAddress: t}) }}
+                value={this.state.draftAddress}
                 inputContainerStyle={styles.inputContainer}
                 inputStyle={{
                   fontSize: 15
@@ -230,12 +252,12 @@ class Map extends React.PureComponent {
               <Button
                 title='ADD PLACE'
                 buttonStyle={styles.inputButton}
+                onPress={() => this.onAddButtonPress()}
               />
             </View>
           :
           null
         }
-        
       </View>
       
     );
