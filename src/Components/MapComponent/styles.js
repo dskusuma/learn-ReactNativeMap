@@ -28,11 +28,50 @@ const styles = StyleSheet.create({
   },
   eventList: {
     position: 'absolute',
-    top: height / 2,
+    top: height / 3,
     left: 0,
     right: 0,
     bottom: 0,
     backgroundColor: '#fff'
+  },
+  formContainer: {
+    position: 'absolute',
+    height: 220,
+    // top: 0,
+    left: 10,
+    right: 10,
+    bottom: 10,
+    backgroundColor: '#fff',
+    borderRadius: 25,
+    opacity: 0.95,
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    shadowOffset: {
+      height: 0,
+      width: 0
+    },
+    elevation: 1,
+    padding: 10,
+    paddingTop: 20,
+    alignItems: 'center'
+  },
+  inputContainer : {
+    borderColor: "#b2bec3",
+    borderWidth: 1,
+    borderRadius: 25,
+    marginBottom: 5
+  },
+  inputLabelStyle: {
+    fontSize: 13
+  },
+  inputCoordinateDetail: {
+    fontSize: 12
+  },
+  inputButton: {
+    marginTop: 15
+  },
+  keyboardAvoidingViewContainer: {
+    width: '100%'
   },
   map: {
     position: 'absolute',

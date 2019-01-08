@@ -7,14 +7,16 @@ import {
   View,
   Text,
   Dimensions,
-  ScrollView
+  ScrollView,
+  KeyboardAvoidingView
 } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker, ProviderPropType, Polygon, Polyline, Callout } from 'react-native-maps';
+import { Input, Icon, Button } from 'react-native-elements'
 
 // Component & Styles Import
 import SilverMapStyle from '../../MapStyles/SilverMapStyle.json'
 import styles from './styles'
-import PriceMarker from '../PriceMarkerComponent/PriceMarker'
+import PriceMarker from '../MarkerComponent/PriceMarker'
 
 const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width/height;
@@ -45,11 +47,12 @@ Event.PropTypes = {
   event: PropTypes.object,
 }
 
-export default class Map extends React.PureComponent {
+class Map extends React.PureComponent {
   constructor(props) {
     super(props);
 
     this.state = {
+      markers: [],
       region: {
         latitude: LATITUDE,
         longitude: LONGITUDE,
@@ -57,6 +60,14 @@ export default class Map extends React.PureComponent {
         longitudeDelta: LONGITUDE_DELTA
       },
       events: [],
+      addingPhase: false,
+      draftMarker: {
+        coordinate: '',
+        key: '',
+        status: '',
+        placeName: '',
+        address: ''
+      }
     }
   }
 
@@ -82,6 +93,31 @@ export default class Map extends React.PureComponent {
     }
   }
 
+  onMapPress(e) {
+    console.log("this.state.addingPhase", this.state.addingPhase)
+    if (this.state.addingPhase === false) {
+      this.recordEvent('Map::onPress');
+      console.log('draftMarker.coordinate: ', e.nativeEvent.coordinate)
+      this.setState({
+          draftMarker: {
+            coordinate: e.nativeEvent.coordinate,
+            key: id++,
+            status: true,
+          },
+        addingPhase: true
+      })
+    } else {
+      this.setState({
+        addingPhase: false,
+        draftMarker: {
+          coordinate: '',
+          key: '',
+          status: false,
+        },
+      })
+    }
+    
+  }
   render() {
     let googleProviderProps = {};
     if (this.props.provider === PROVIDER_GOOGLE) {
@@ -101,7 +137,7 @@ export default class Map extends React.PureComponent {
           showMyLocationButton
           onRegionChange={this.recordEvent('Map::onRegionChange')}
           onRegionChangeComplete={this.recordEvent('Map::onRegionChangeComplete')}
-          onPress={this.recordEvent('Map::onPress')}
+          onPress={(e) => {this.onMapPress(e)}}
           onPanDrag={this.recordEvent('Map::onPanDrag')}
           onLongPress={this.recordEvent('Map::onLongPress')}
           onMarkerPress={this.recordEvent('Map::onMarkerPress')}
@@ -110,7 +146,21 @@ export default class Map extends React.PureComponent {
           onCalloutPress={this.recordEvent('Map::onCalloutPress')}
           {...googleProviderProps}
         >
-          <Marker
+          {this.state.markers.map( marker => (
+            <Marker
+              key={marker.key}
+              coordinate={marker.coordinate}
+            />
+          ))}
+          {this.state.draftMarker.status === true 
+            ? 
+            <Marker
+              coordinate={this.state.draftMarker.coordinate}
+            />
+            :
+            null
+            }
+          {/* <Marker
             coordinate={{
               latitude: LATITUDE + (LATITUDE_DELTA / 2),
               longitude: LONGITUDE + (LONGITUDE_DELTA / 2),
@@ -140,13 +190,52 @@ export default class Map extends React.PureComponent {
                 <Text>Well hello there...</Text>
               </View>
             </Callout>
-          </Marker>
+          </Marker> */}
         </MapView>
-        <View style={styles.eventList}>
+        {/* <View style={styles.eventList}>
           <ScrollView>
             {this.state.events.map(event => <Event key={event.id} event={event} />)}
           </ScrollView>
-        </View>
+        </View> */}
+        {
+          this.state.addingPhase ? 
+            <View style={styles.formContainer}>
+            
+              <Input 
+                placeholder="Place's name"
+                leftIcon={{ type: 'font-awesome', name: 'home' , color: '#b2bec3'}}
+                shake={true}
+
+                inputContainerStyle={styles.inputContainer}
+                inputStyle={{
+                  fontSize: 15
+                }}
+              />
+
+              <Input 
+                placeholder="Address' name"
+                leftIcon={{ type: 'font-awesome', name: 'location-arrow' , color: '#b2bec3'}}
+                shake={true}
+                inputContainerStyle={styles.inputContainer}
+                inputStyle={{
+                  fontSize: 15
+                }}
+              />
+
+              <View >
+                <Text style={styles.inputCoordinateDetail}>Lat: {this.state.draftMarker.coordinate.latitude}</Text>
+                <Text style={styles.inputCoordinateDetail}>Long: {this.state.draftMarker.coordinate.longitude}</Text>
+              </View>
+
+              <Button
+                title='ADD PLACE'
+                buttonStyle={styles.inputButton}
+              />
+            </View>
+          :
+          null
+        }
+        
       </View>
       
     );
@@ -157,4 +246,4 @@ Map.propTypes = {
   provider: ProviderPropType,
 }
 
- 
+export default Map;
