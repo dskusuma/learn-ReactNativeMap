@@ -4,7 +4,8 @@ import { AppRegistry, StyleSheet, View } from 'react-native';
 import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 
 // Component & Styles Import
-import SilverMapStyle from '../MapStyles/SilverMapStyle.json'
+import SilverMapStyle from '../../MapStyles/SilverMapStyle.json'
+import styles from './styles'
 
 export default class Map extends React.PureComponent {
   render() {
