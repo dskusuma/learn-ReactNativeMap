@@ -2,21 +2,16 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { 
-  AppRegistry, 
-  StyleSheet, 
   View,
   Text,
   Dimensions,
-  ScrollView,
-  KeyboardAvoidingView
 } from 'react-native';
 import MapView, { PROVIDER_GOOGLE, Marker, ProviderPropType, Polygon, Polyline, Callout } from 'react-native-maps';
-import { Input, Icon, Button } from 'react-native-elements'
+import { Input,Button } from 'react-native-elements'
 
 // Component & Styles Import
 import SilverMapStyle from '../../MapStyles/SilverMapStyle.json'
 import styles from './styles'
-import PriceMarker from '../MarkerComponent/PriceMarker'
 
 const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width/height;
